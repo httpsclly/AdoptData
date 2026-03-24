@@ -1,117 +1,48 @@
-# AdoptData - Projeto ETL
+# AdoptData
 
-Projeto de estudo na área de Engenharia de Dados. Consiste em um pipeline ETL (Extract, Transform, Load) que coleta dados de um abrigo de animais do condado de Sonoma (Califórnia, EUA) através de uma API pública, transforma e analisa os dados, e os salva para uso posterior.
+Pipeline ETL em Python que coleta dados de animais em abrigos do condado de Sonoma (EUA) via API pública, limpa e analisa os dados, e salva os resultados.
 
-## O que é ETL?
+## Etapas
 
-ETL é um processo em 3 etapas para mover e preparar dados:
+### Extract
+Faz uma requisição HTTP à API pública do abrigo de animais de Sonoma County e coleta até 10.000 registros em formato JSON, convertendo para um DataFrame do Pandas.
 
-1. **Extract (Extrair)** — buscar os dados brutos na fonte
-2. **Transform (Transformar)** — limpar e organizar os dados
-3. **Load (Carregar)** — salvar os dados prontos para uso
+### Transform
+- Remove a coluna `location` e elimina linhas duplicadas
+- Converte `intake_date` e `outcome_date` para datetime
+- Converte `days_in_shelter` para numérico
+- Padroniza colunas de texto para Title Case e preenche nulos com "Desconhecido"
+- Cria a coluna `ano` a partir da data de entrada
 
----
+### EDA
+Gera estatísticas no terminal (shape, nulos, contagens por tipo, raça e destino) e salva três gráficos em `data/output/`:
+- `grafico_tipo.png` — animais por tipo
+- `grafico_destino.png` — destinos mais comuns
+- `grafico_ano.png` — entradas por ano
 
-## Etapas do Pipeline
-
-### 1. Extract (Extração)
-
-```python
-def extract():
-```
-
-- Faz uma requisição HTTP à API pública do abrigo de animais de Sonoma County (`data.sonomacounty.ca.gov`)
-- Coleta até 10.000 registros em formato JSON usando `urllib.request`
-- Converte os dados para um DataFrame do Pandas
-- Não requer autenticação nem chave de API
-
-### 2. Transform (Transformação)
-
-```python
-def transform(df):
-```
-
-Nesta etapa os dados brutos são limpos e enriquecidos:
-
-- **Remove coluna `location`** — descarta a coluna que contém dicionários aninhados
-- **Remove duplicatas** — elimina linhas repetidas
-- **Converte datas** — transforma `intake_date` e `outcome_date` em formato datetime
-- **Converte numéricos** — transforma `days_in_shelter` em tipo numérico
-- **Padroniza textos** — normaliza colunas como `type`, `breed`, `color`, `sex`, `intake_type` e `outcome_type` para formato Title Case, preenchendo nulos com "Desconhecido"
-- **Extrai ano** — cria a coluna `ano` a partir da data de entrada no abrigo
-
-### 3. EDA (Análise Exploratória)
-
-```python
-def eda(df):
-```
-
-Após a transformação, o pipeline executa uma análise exploratória automática que imprime no terminal:
-
-- **Shape** — quantidade de linhas e colunas
-- **Valores nulos** — campos que ainda possuem dados faltantes
-- **Dias no abrigo** — estatísticas descritivas (média, mediana, min, max)
-- **Animais por tipo** — contagem de cães, gatos, etc.
-- **Destino dos animais** — top 10 tipos de desfecho (adoção, transferência, etc.)
-- **Top 10 raças** — raças mais frequentes no abrigo
-- **Entradas por ano** — evolução temporal dos registros
-
-Também gera três gráficos salvos em `data/output/`:
-
-- `grafico_tipo.png` — gráfico de barras com quantidade de animais por tipo
-- `grafico_destino.png` — gráfico de barras horizontal com os destinos mais comuns
-- `grafico_ano.png` — gráfico de linha com evolução de entradas por ano
-
-### 4. Load (Carga)
-
-```python
-def load(df):
-```
-
-Salva os dados transformados em dois formatos dentro da pasta `data/output/`:
-
-- **CSV** (`AdoptData.csv`) — formato universal, abre no Excel
-- **Parquet** (`AdoptData.parquet`) — formato compacto e rápido, ideal para análise com Python
-
----
+### Load
+Salva os dados transformados em dois formatos:
+- **CSV** (`AdoptData.csv`) — formato universal
+- **Parquet** (`AdoptData.parquet`) — formato compacto e otimizado
 
 ## Como usar
 
-### Pré-requisitos
-
-Instale as dependências:
-
 ```bash
 pip install pandas matplotlib pyarrow
-```
-
-### Executar
-
-```bash
 python data/AdoptData.py
 ```
 
-O pipeline vai extrair, transformar, analisar e salvar os dados automaticamente. Nenhuma configuração adicional é necessária — a API é pública e gratuita.
-
----
-
-## Estrutura do Projeto
+## Estrutura
 
 ```
-ETL - Projeto/
-├── README.md              # Este arquivo
-├── requirements.txt       # Dependências do Python
+AdoptData/
+├── README.md
+├── requirements.txt
 └── data/
-    ├── AdoptData.py     # Pipeline ETL + EDA (código principal)
-    └── output/            # Dados gerados (CSV, Parquet e gráficos)
+    ├── AdoptData.py       # Pipeline principal
+    └── output/            # Dados e gráficos gerados
 ```
 
----
+## Tecnologias
 
-## Tecnologias Utilizadas
-
-- **Python 3** — linguagem principal
-- **pandas** — manipulação e análise de dados
-- **matplotlib** — geração de gráficos
-- **urllib** — requisições HTTP (biblioteca padrão)
-- **pyarrow** — exportação em formato Parquet
+Python, Pandas, Matplotlib, PyArrow
